@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('particals/head') %>
+    <title>Sign up | LinkSnip</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#4f46e5,#7c3aed,#ec4899)] p-4">
+    <main class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#4f46e5,#7c3aed)] text-2xl">🔗</div>
+        <h1 class="text-2xl font-bold text-slate-900">Create your account</h1>
+        <p class="mt-1 text-slate-500">Start shortening links in seconds</p>
+      </div>
+
+      <% if (locals.error) { %>
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <form action="/user" method="post" class="space-y-4">
+        <div>
+          <label for="name" class="mb-1 block text-sm font-medium text-slate-700">Full name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </div>
+        <div>
+          <label for="email" class="mb-1 block text-sm font-medium text-slate-700">Email address</label>
+          <input type="email" id="email" name="email" placeholder="name@example.com" required
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </div>
+        <div>
+          <label for="password" class="mb-1 block text-sm font-medium text-slate-700">Password</label>
+          <input type="password" id="password" name="password" placeholder="At least 6 characters" minlength="6" required
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+        </div>
+        <button type="submit"
+          class="w-full rounded-lg bg-[linear-gradient(135deg,#4f46e5,#7c3aed)] px-4 py-3 font-semibold text-white shadow hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          Sign up
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-500">
+        Already have an account?
+        <a href="/login" class="font-semibold text-indigo-600 hover:underline">Login</a>
+      </p>
+    </main>
+  </body>
+</html>

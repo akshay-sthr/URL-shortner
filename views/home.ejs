@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('particals/head') %>
+    <title>Dashboard | LinkSnip</title>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+
+    <nav class="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+        <a href="/" class="flex items-center gap-2 text-lg font-bold">
+          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#4f46e5,#7c3aed)] text-lg">🔗</span>
+          LinkSnip
+        </a>
+        <a href="/user/logout"
+          class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          Logout
+        </a>
+      </div>
+    </nav>
+
+    <main class="mx-auto max-w-4xl px-4 py-8">
+
+      <section class="mb-8 rounded-2xl bg-white p-6 shadow-lg shadow-indigo-100 md:p-8">
+        <h1 class="text-2xl font-bold">Shorten a long link</h1>
+        <p class="mb-5 mt-1 text-slate-500">Paste a URL below and get a short link you can share.</p>
+
+        <% if (locals.error) { %>
+          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            <%= error %>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/url" class="flex flex-col gap-3 sm:flex-row">
+          <input type="text" name="url" placeholder="https://example.com/very/long/link" required
+            class="w-full flex-1 rounded-lg border border-slate-300 px-4 py-3 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+          <button type="submit"
+            class="rounded-lg bg-[linear-gradient(135deg,#4f46e5,#7c3aed)] px-6 py-3 font-semibold text-white shadow hover:brightness-110">
+            Shorten
+          </button>
+        </form>
+
+        <% if (locals.shortUrl) { %>
+          <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <p class="mb-2 text-sm font-semibold text-emerald-800">✅ Your short link is ready</p>
+            <div class="flex gap-2">
+              <input type="text" value="<%= shortUrl %>" readonly
+                class="w-full flex-1 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-700" />
+              <button type="button" data-url="<%= shortUrl %>"
+                class="copy-btn rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                Copy
+              </button>
+            </div>
+          </div>
+        <% } %>
+      </section>
+
+
+      <section class="overflow-hidden rounded-2xl bg-white shadow">
+        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+          <h2 class="text-lg font-bold">Your links</h2>
+          <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+            <%= locals.urls ? urls.length : 0 %> total
+          </span>
+        </div>
+
+        <% if (locals.urls && urls.length) { %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th class="px-6 py-3">Short link</th>
+                  <th class="px-4 py-3">Original URL</th>
+                  <th class="px-4 py-3 text-center">Clicks</th>
+                  <th class="hidden px-4 py-3 md:table-cell">Created</th>
+                  <th class="px-6 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <% urls.slice().reverse().forEach((url) => { %>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                      <a target="_blank" data-short-id="<%= url.shortId %>"
+                        class="font-semibold text-indigo-600 hover:underline">/url/<%= url.shortId %></a>
+                    </td>
+                    <td class="px-4 py-4">
+                      <div class="max-w-260px truncate text-slate-500" title="<%= url.redirectURL %>">
+                        <%= url.redirectURL %>
+                      </div>
+                    </td>
+                    <td class="px-4 py-4 text-center">
+                      <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                        <%= url.visitHistory.length %>
+                      </span>
+                    </td>
+                    <td class="hidden px-4 py-4 text-xs text-slate-500 md:table-cell">
+                      <%= url.createdAt ? new Date(url.createdAt).toLocaleDateString("en-IN") : "" %>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <button type="button" data-id="<%= url.shortId %>"
+                        class="copy-btn rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
+                        Copy
+                      </button>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="px-6 py-14 text-center">
+            <div class="text-4xl">🔗</div>
+            <p class="mt-2 text-slate-500">No links yet. Create your first short link above.</p>
+          </div>
+        <% } %>
+      </section>
+    </main>
+
+    <script>
+
+      document.querySelectorAll("[data-short-id]").forEach((el) => {
+        const full = location.origin + "/url/" + el.dataset.shortId;
+        el.href = full;
+        el.textContent = full.replace(/^https?:\/\//, "");
+      });
+
+
+      document.querySelectorAll(".copy-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const text = btn.dataset.url || location.origin + "/url/" + btn.dataset.id;
+          navigator.clipboard.writeText(text).then(() => {
+            const old = btn.textContent;
+            btn.textContent = "Copied ✓";
+            setTimeout(() => (btn.textContent = old), 1500);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
